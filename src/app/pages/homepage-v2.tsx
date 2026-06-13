@@ -10,10 +10,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useML, useMLStore } from '@/store/ml.store'
-import { usePlayerActions } from '@/store/player.store'
+import { usePlayerActions, useIsMyWaveActive, usePlayerStore } from '@/store/player.store'
 import { useMLPlaylists } from '@/store/ml-playlists.store'
 import { useMLPlaylistsStateActions } from '@/store/ml-playlists-state.store'
-import { generateMyWavePlaylist } from '@/service/ml-wave-service'
+import { playMyWaveStream } from '@/service/my-wave-stream'
 import { generateCSSGradient } from '@/utils/genreColors'
 import { getGenres, getSongsByGenre, getRandomSongs, getStarredArtists } from '@/service/subsonic-api'
 import { getSimpleCoverArtUrl } from '@/api/httpClient'
@@ -652,6 +652,8 @@ export default function NewHomepage() {
   const [myWaveArtists, setMyWaveArtists] = useState<any[]>([])
   const { getProfile, ratings } = useML()
   const { setSongList } = usePlayerActions()
+  const isMyWaveActive = useIsMyWaveActive()
+  const isPlaying = usePlayerStore((s) => s.playerState.isPlaying)
   // Берём названия из сохранённых плейлистов (если есть)
   const { getPlaylist } = useMLPlaylistsStateActions()
   const dailyMixPL = getPlaylist('daily-mix')
@@ -825,15 +827,27 @@ export default function NewHomepage() {
 
   const handleMyWavePlay = async () => {
     if (isGenerating) return
+
+    if (isMyWaveActive) {
+      usePlayerStore.getState().actions.togglePlayPause()
+      return
+    }
+
     setIsGenerating('mywave')
 
     try {
       const likedSongIds = profile.likedSongs || []
-      const playlist = await generateMyWavePlaylist(likedSongIds, ratings, trackCount, true)
+      const { songs, alreadyActive } = await playMyWaveStream({
+        likedSongIds,
+        ratings,
+      })
 
-      if (playlist.songs.length > 0) {
-        setSongList(playlist.songs, 0)
-        toast.success('Моя волна запущена!', { type: 'success' })
+      if (alreadyActive || songs.length > 0) {
+        if (!alreadyActive) {
+          toast.success('Моя волна запущена!', { type: 'success' })
+        }
+      } else {
+        toast.error('Не удалось запустить Мою волну')
       }
     } catch (error) {
       console.error('Ошибка генерации "Моя волна":', error)
@@ -966,7 +980,12 @@ export default function NewHomepage() {
                     {isGenerating === 'mywave' ? (
                       <>
                         <div className="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900" />
-                        <span>Генерация...</span>
+                        <span>Запуск...</span>
+                      </>
+                    ) : isMyWaveActive ? (
+                      <>
+                        <Play className="h-5 w-5 shrink-0 fill-gray-900 text-gray-900" />
+                        <span>{isPlaying ? 'Слушаю' : 'Продолжить'}</span>
                       </>
                     ) : (
                       <>

@@ -700,6 +700,7 @@ export function Player() {
               ? song.url 
               : getSongStreamUrl(song.id)}
           autoPlay={isPlaying}
+          preload="auto"
           audioRef={audioRef}
           loop={loopState === LoopState.One}
           onPlay={() => setPlayingState(true)}
