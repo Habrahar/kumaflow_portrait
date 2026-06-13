@@ -1011,28 +1011,39 @@ export async function generateDailyMix(
   preferredGenres: Record<string, number>,
   preferredArtists: Record<string, number>,
   ratings: Record<string, any>,
-  limit: number = 25
+  limit: number = 25,
+  options?: {
+    force?: boolean
+    excludeSongIds?: string[]
+  }
 ): Promise<{ playlist: MLWavePlaylist; metadata: MLPlaylistMetadata }> {
   // Проверяем кэш
   const today = new Date().toISOString().split('T')[0]
   const cacheKey = `daily-mix-${today}`
-  const cached = playlistCache.get(cacheKey)
-  if (cached) {
-    console.log('[DailyMix v2] Using cached playlist')
-    const now = new Date()
-    return {
-      playlist: { songs: cached, source: 'cached' },
-      metadata: {
-        id: cacheKey, type: 'daily-mix', name: 'Ежедневный микс',
-        description: `Персональный микс на ${now.toLocaleDateString('ru-RU')}`,
-        createdAt: now.toISOString(),
-        expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(),
-      },
+  if (!options?.force) {
+    const cached = playlistCache.get(cacheKey)
+    if (cached) {
+      console.log('[DailyMix v2] Using cached playlist')
+      const now = new Date()
+      return {
+        playlist: { songs: cached, source: 'cached' },
+        metadata: {
+          id: cacheKey, type: 'daily-mix', name: 'Ежедневный микс',
+          description: `Персональный микс на ${now.toLocaleDateString('ru-RU')}`,
+          createdAt: now.toISOString(),
+          expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(),
+        },
+      }
     }
   }
 
   const songs: ISong[] = []
   const usedSongIds = new Set<string>()
+
+  options?.excludeSongIds?.forEach((id) => usedSongIds.add(id))
+  if (options?.excludeSongIds?.length) {
+    console.log(`[DailyMix v2] 🚫 Excluding ${options.excludeSongIds.length} tracks from previous day`)
+  }
 
   // Исключаем дизлайкнутые треки
   const dislikedSongIds = new Set<string>(
@@ -2806,13 +2817,13 @@ export interface TimeOfDayMix {
 /**
  * Получить текущее время суток
  */
-function getTimeOfDay(): 'morning' | 'day' | 'evening' | 'night' {
-  const hour = new Date().getHours()
-  
-  if (hour >= 5 && hour < 12) return 'morning'    // 5:00 - 12:00
-  if (hour >= 12 && hour < 17) return 'day'       // 12:00 - 17:00
-  if (hour >= 17 && hour < 22) return 'evening'   // 17:00 - 22:00
-  return 'night'                                   // 22:00 - 5:00
+export function getTimeOfDay(date = new Date()): 'morning' | 'day' | 'evening' | 'night' {
+  const hour = date.getHours()
+
+  if (hour >= 5 && hour < 12) return 'morning'
+  if (hour >= 12 && hour < 17) return 'day'
+  if (hour >= 17 && hour < 22) return 'evening'
+  return 'night'
 }
 
 /**
@@ -2904,12 +2915,7 @@ export async function generateTimeOfDayMix(
   limit: number = 25
 ): Promise<TimeOfDayMix> {
   const hour = new Date().getHours()
-  let timeOfDay: 'morning' | 'day' | 'evening' | 'night'
-
-  if (hour >= 6 && hour < 12) timeOfDay = 'morning'
-  else if (hour >= 12 && hour < 18) timeOfDay = 'day'
-  else if (hour >= 18 && hour < 23) timeOfDay = 'evening'
-  else timeOfDay = 'night'
+  const timeOfDay = getTimeOfDay()
 
   const config = TIME_ENERGY_CURVE[timeOfDay]
 
@@ -2961,8 +2967,7 @@ export async function generateTimeOfDayMix(
 
   Object.entries(ratings).forEach(([songId, rating]) => {
     if (rating.playCount && rating.playCount > 0 && rating.lastPlayed) {
-      const playedHour = new Date(rating.lastPlayed).getHours()
-      const playedTod = getTimeOfDay(playedHour)
+      const playedTod = getTimeOfDay(new Date(rating.lastPlayed))
       if (!userTimeHistory[playedTod]) userTimeHistory[playedTod] = new Set()
       userTimeHistory[playedTod].add(songId)
     }
