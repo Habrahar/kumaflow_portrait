@@ -90,6 +90,7 @@ class MLPlaylistAutoUpdateService {
         playlistsToUpdate.push('time-of-day')
       }
 
+      const otherPlaylistTypes = [
         { type: 'discover-weekly', minHours: 168 },
         { type: 'ml-recommendations', minHours: mlSettings.autoUpdateHours },
         { type: 'because-you-listened', minHours: mlSettings.autoUpdateHours },
