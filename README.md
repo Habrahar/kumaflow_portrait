@@ -1,11 +1,33 @@
-# 🎵 KumaFlow 
+# 🎵 KumaFlow Portrait
 
-**Современный музыкальный плеер для Navidrome/Subsonic с ML-рекомендациями, Vibe Similarity и полной кастомизацией**
+**Мобильный форк [KumaFlow](https://github.com/mrSaT13/kumaflow) — адаптивный UI для телефона, тёплый старт и автогенерация плейлистов**
 
 [![Release](https://img.shields.io/github/v/release/mrSaT13/kumaflow)](https://github.com/mrSaT13/kumaflow/releases/latest)
 [![License](https://img.shields.io/github/license/mrSaT13/kumaflow)](LICENSE.txt)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)](https://github.com/mrSaT13/kumaflow/releases)
-[![Downloads](https://img.shields.io/github/downloads/mrSaT13/kumaflow/total)](https://github.com/mrSaT13/kumaflow/releases)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Mobile-blue)](https://github.com/Habrahar/kumaflow_portrait)
+[![Fork](https://img.shields.io/badge/fork-KumaFlow-orange)](https://github.com/mrSaT13/kumaflow)
+
+---
+
+## 📱 О форке
+
+Это **личный форк** оригинального [KumaFlow](https://github.com/mrSaT13/kumaflow), сделанный для **удобной работы на телефоне** и ряда улучшений повседневного использования.
+
+> Оригинал: [mrSaT13/kumaflow](https://github.com/mrSaT13/kumaflow) · Этот репозиторий: [Habrahar/kumaflow_portrait](https://github.com/Habrahar/kumaflow_portrait)
+
+### Что добавлено в Portrait
+
+| Направление | Что сделано |
+|-------------|-------------|
+| **📱 Мобильный UI** | Единый responsive-интерфейс вместо отдельной Mobile-страницы: нижняя навигация, touch-плеер, мобильные списки треков, полноэкранный режим под палец |
+| **⚙️ Настройки** | Карточный layout, боковая панель, поиск, страницы по категориям — удобно на узком экране |
+| **🏠 Главная** | Компактная ML-сетка, улучшенный homepage-v2, блок недавних альбомов |
+| **🔥 Тёплый старт** | При возврате в приложение — без splash и тяжёлой перезагрузки; сессия живёт ~10 мин при паузе |
+| **🤖 ML по расписанию** | Ежедневный микс в полночь (~8 ч, без повторов с прошлым днём), микс по времени суток каждые 4 ч |
+
+### Зачем отдельный репозиторий
+
+Форк позволяет экспериментировать с мобильным UX и быстрыми улучшениями, **не ломая стабильный upstream**. Удачные изменения можно позже предложить в основной проект через Pull Request.
 
 ---
 
@@ -174,6 +196,7 @@
 - ✅ 4K мониторов
 - ✅ Ultrawide (21:9)
 - ✅ Ноутбуков (1366x768)
+- ✅ **Телефонов и планшетов (Portrait fork)** — нижняя навигация, touch-плеер, 100dvh
 
 ---
 
@@ -413,9 +436,13 @@ URL: http://your-server:4533
 
 ### Установка
 ```bash
-git clone https://github.com/mrSaT13/kumaflow.git
-cd kumaflow
+# Форк Portrait
+git clone https://github.com/Habrahar/kumaflow_portrait.git
+cd kumaflow_portrait
 pnpm install
+
+# Или оригинальный KumaFlow
+# git clone https://github.com/mrSaT13/kumaflow.git
 ```
 
 ### Запуск
@@ -462,6 +489,7 @@ Apache-2.0 — см. [LICENSE.txt](LICENSE.txt)
 
 ## 🙏 Благодарности
 
+- [KumaFlow](https://github.com/mrSaT13/kumaflow) — upstream, от которого сделан этот форк
 - [Aonsoku](https://github.com/victoralvesf/aonsoku) — оригинальный проект
 - [Navidrome](https://www.navidrome.org/) — музыкальный сервер
 - [Subsonic](http://www.subsonic.org/) — API стандарт
@@ -471,9 +499,9 @@ Apache-2.0 — см. [LICENSE.txt](LICENSE.txt)
 
 ## 📞 Контакты
 
-- **GitHub:** [@mrSaT13](https://github.com/mrSaT13)
-- **Issues:** [GitHub Issues](https://github.com/mrSaT13/kumaflow/issues)
+- **Portrait fork:** [@Habrahar](https://github.com/Habrahar) · [kumaflow_portrait](https://github.com/Habrahar/kumaflow_portrait)
+- **Upstream:** [@mrSaT13](https://github.com/mrSaT13) · [Issues](https://github.com/mrSaT13/kumaflow/issues)
 
 ---
 
-**KumaFlow** — ваш умный музыкальный поток 🎵
+**KumaFlow Portrait** — умный плеер, удобный и на телефоне 🎵
