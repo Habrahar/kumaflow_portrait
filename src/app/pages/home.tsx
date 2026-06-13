@@ -26,6 +26,7 @@ import { getGenres } from '@/service/subsonic-api'
 import { toast } from 'react-toastify'
 import { useQuery } from '@tanstack/react-query'
 import { useHomepageSettings } from '@/store/homepage.store'
+import { useIsMobile } from '@/app/hooks/use-mobile'
 import NewHomepage from '@/app/pages/homepage-v2'  // 🆕 Новый дизайн
 
 // Градиенты для жанров
@@ -78,7 +79,9 @@ export default function Home() {
 
 function HomeDesignRouter() {
   const settings = useHomepageSettings()
-  if (settings.newDesignEnabled) {
+  const isMobile = useIsMobile()
+
+  if (settings.newDesignEnabled || isMobile) {
     return <NewHomepage />
   }
   return <OldHomepage />

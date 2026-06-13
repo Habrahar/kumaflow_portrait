@@ -53,7 +53,11 @@ const options: OptionsData[] = [
   { id: 'privacy', icon: EarthLock },
 ]
 
-export function SettingsOptions() {
+export function getSettingsOptions() {
+  return options
+}
+
+export function SettingsOptions({ onSelect }: { onSelect?: () => void }) {
   const { t } = useTranslation()
   const { currentPage, setCurrentPage } = useAppSettings()
 
@@ -65,7 +69,10 @@ export function SettingsOptions() {
             <SidebarMenuItem key={item.id}>
               <SidebarMenuButton
                 isActive={item.id === currentPage}
-                onClick={() => setCurrentPage(item.id)}
+                onClick={() => {
+                  setCurrentPage(item.id)
+                  onSelect?.()
+                }}
               >
                 <item.icon />
                 <span>{t(`settings.options.${item.id}`)}</span>

@@ -367,6 +367,13 @@ export const useAppStore = createWithEqualityFn<IAppContext>()(
             setOpenDialog: (value) => {
               set((state) => {
                 state.settings.openDialog = value
+                state.settings.mobileView = 'categories'
+              })
+            },
+            mobileView: 'categories',
+            setMobileView: (view) => {
+              set((state) => {
+                state.settings.mobileView = view
               })
             },
             currentPage: 'appearance',

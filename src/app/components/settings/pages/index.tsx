@@ -1,5 +1,4 @@
-import { SettingsOptions } from '@/app/components/settings/options'
-import { useAppSettings } from '@/store/app.store'
+import type { SettingsOptions } from '@/app/components/settings/options'
 import { Accounts } from './accounts'
 import { Account } from './account'
 import { Appearance } from './appearance'
@@ -24,13 +23,12 @@ const pages: Record<SettingsOptions, JSX.Element> = {
   privacy: <Privacy />,
 }
 
-export function Pages() {
-  const { currentPage } = useAppSettings()
+export function Pages({ page }: { page?: SettingsOptions }) {
+  const currentPage = page ?? 'appearance'
 
-  // Ограничиваем ширину только для вкладки "Учётки"
   if (currentPage === 'accounts') {
     return (
-      <div className="max-w-2xl mx-auto">
+      <div className="mx-auto max-w-2xl">
         {pages[currentPage]}
       </div>
     )
