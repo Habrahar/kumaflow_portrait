@@ -109,6 +109,14 @@ export function SettingsSearch({ onClose, embedded = false }: SettingsSearchProp
     
     // === Last.fm ===
     {
+      id: 'lastfm-api',
+      title: 'Last.fm API ключ',
+      description: 'Настройка API ключа и авторизации Last.fm',
+      category: 'Внешние API',
+      keywords: ['lastfm', 'api', 'ключ', 'авторизация', 'last.fm', 'внешние'],
+      sectionId: 'lastfm',
+    },
+    {
       id: 'lastfm-tags',
       title: 'Last.fm Теги',
       description: 'Импорт жанров и настроений из Last.fm',
@@ -116,7 +124,7 @@ export function SettingsSearch({ onClose, embedded = false }: SettingsSearchProp
       keywords: ['lastfm', 'теги', 'жанры', 'настроения', 'импорт', 'last.fm'],
       sectionId: 'lastfm',
     },
-    
+
     // === Кэш ===
     {
       id: 'cache-auto-starred',
@@ -212,9 +220,9 @@ export function SettingsSearch({ onClose, embedded = false }: SettingsSearchProp
     // Для разных секций - разные страницы
     const pageRoutes: Record<string, string> = {
       'ml-playlists': '/settings/ml-playlists',
-      'analysis': '/settings/ml-playlists',  // Анализ в ML настройках
-      'lastfm': '/settings/external-api',  // Last.fm во внешних API
-      'cache': '/cache',  // Кэш на отдельной странице
+      'analysis': '/settings/ml-playlists',
+      'lastfm': '/settings/external-api',
+      'cache': '/cache',
     }
 
     if (!item.sectionId) return

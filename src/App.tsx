@@ -29,6 +29,28 @@ import { mlPlaylistAutoUpdate } from '@/service/ml-playlist-auto-update'
 import { getFavoriteArtists } from '@/service/subsonic-api'
 import { checkAndGenerateHolidayPlaylists } from '@/service/holiday-playlist-generator'  // 🆕
 import { ensureSessionStarted, isWarmSession } from '@/service/app-session'
+import { isValidServerConnection } from '@/utils/server-config'
+
+function runServerDependentStartup(syncFavoriteArtists: () => Promise<void>) {
+  const data = useAppStore.getState().data
+
+  if (!isValidServerConnection(data)) {
+    console.log('[App] Server not configured, skipping Navidrome startup tasks')
+    return
+  }
+
+  console.log('[App] Starting Dual URL background service...')
+  dualUrlBackgroundService.start()
+
+  console.log('[App] Starting ML playlist auto-update service...')
+  mlPlaylistAutoUpdate.start()
+
+  console.log('[App] Checking holiday playlists...')
+  checkAndGenerateHolidayPlaylists()
+
+  console.log('[App] Syncing favorite artists from Navidrome...')
+  void syncFavoriteArtists()
+}
 
 function App() {
   const [isLoading, setIsLoading] = useState(() => !isWarmSession())
@@ -79,25 +101,37 @@ function App() {
     initializeServices()
     initializeListenBrainz()
 
-    // Запуск фонового мониторинга Dual URL
-    console.log('[App] Starting Dual URL background service...')
-    dualUrlBackgroundService.start()
+    const startServerTasks = () => runServerDependentStartup(syncFavoriteArtists)
 
-    // Запуск автообновления ML плейлистов
-    console.log('[App] Starting ML playlist auto-update service...')
-    mlPlaylistAutoUpdate.start()
+    if (useAppStore.persist.hasHydrated()) {
+      startServerTasks()
+    } else {
+      useAppStore.persist.onFinishHydration(startServerTasks)
+    }
 
-    // 🆕 Проверка и генерация праздничных плейлистов
-    console.log('[App] Checking holiday playlists...')
-    checkAndGenerateHolidayPlaylists()
+    const unsubscribe = useAppStore.subscribe(
+      (state) =>
+        isValidServerConnection(state.data)
+          ? `${state.data.url}:${state.data.username}`
+          : '',
+      (connectionKey, prevKey) => {
+        if (connectionKey && connectionKey !== prevKey) {
+          startServerTasks()
+        }
+      },
+    )
 
-    // ВАЖНО: Автосинхронизация лайкнутых артистов из Navidrome
-    console.log('[App] Syncing favorite artists from Navidrome...')
-    syncFavoriteArtists()
+    return () => {
+      unsubscribe()
+    }
   }, [initializeServices, initializeListenBrainz])
 
   // Функция синхронизации лайкнутых артистов
   async function syncFavoriteArtists() {
+    if (!isValidServerConnection(useAppStore.getState().data)) {
+      return
+    }
+
     try {
       const favoriteArtists = await getFavoriteArtists()
       console.log(`[App] ✅ Got ${favoriteArtists.length} favorite artists from Navidrome`)

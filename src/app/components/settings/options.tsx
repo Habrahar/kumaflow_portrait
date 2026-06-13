@@ -1,5 +1,6 @@
 import {
   CircleUserRound,
+  Cloud,
   Database,
   EarthLock,
   FileText,
@@ -25,6 +26,7 @@ export type SettingsOptions =
   | 'appearance'
   | 'language'
   | 'audio'
+  | 'external-api'
   | 'content'
   | 'local-music'
   | 'cache'
@@ -48,6 +50,7 @@ const options: OptionsData[] = [
   { id: 'appearance', icon: Paintbrush },
   { id: 'language', icon: Globe },
   { id: 'audio', icon: Headphones },
+  { id: 'external-api', icon: Cloud },
   { id: 'content', icon: FileText },
   ...(isDesktop() ? [localMusicOption, cacheOption, accountsOption, accountOption, desktopOption] : []),
   { id: 'privacy', icon: EarthLock },

@@ -9,7 +9,7 @@ import { LLMSettings } from '@/app/components/settings/llm-settings'
 
 export function Content() {
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-4 pb-2">
+    <div className="w-full min-w-0 space-y-4 pb-2">
       <MLPlaylistsContent />
       <AutoDJContent />
       <HolidayPlaylistsSettings />

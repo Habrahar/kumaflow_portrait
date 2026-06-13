@@ -6,6 +6,7 @@ const SETTINGS_PAGES: SettingsOptions[] = [
   'appearance',
   'language',
   'audio',
+  'external-api',
   'content',
   'local-music',
   'cache',
