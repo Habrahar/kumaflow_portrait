@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import { isDesktop } from 'react-device-detect'
 import { RouterProvider } from 'react-router-dom'
 import { Linux } from '@/app/components/controls/linux'
 import { SettingsDialog } from '@/app/components/settings/dialog'
+import { SettingsTrayListener } from '@/app/components/settings/tray-listener'
 import { SplashScreen } from '@/app/components/splash-screen'
 import { FloatingPlayer } from '@/app/components/floating-player'
 import { PWAInstallPrompt } from '@/app/components/pwa'
@@ -13,12 +13,12 @@ import { AIPatternMonitor } from '@/service/ai-playlist-patterns'
 import { createAIPlaylist } from '@/service/ai-playlist-agent'
 import { useMLStore } from '@/store/ml.store'
 import { useExternalApiStore } from '@/store/external-api.store'
+import { AppSessionObserver } from '@/app/observers/app-session-observer'
 import { LangObserver } from '@/app/observers/lang-observer'
 import { MediaSessionObserver } from '@/app/observers/media-session-observer'
 import { ThemeObserver } from '@/app/observers/theme-observer'
 import { ToastContainer } from '@/app/observers/toast-container'
 import { UpdateObserver } from '@/app/observers/update-observer'
-import { Mobile } from '@/app/pages/mobile'
 import { router } from '@/routes/router'
 import { isDesktop as isElectron, isLinux } from '@/utils/desktop'
 import { useListenBrainzStore } from '@/store/listenbrainz.store'
@@ -28,9 +28,10 @@ import { dualUrlBackgroundService } from '@/service/dual-url-background-service'
 import { mlPlaylistAutoUpdate } from '@/service/ml-playlist-auto-update'
 import { getFavoriteArtists } from '@/service/subsonic-api'
 import { checkAndGenerateHolidayPlaylists } from '@/service/holiday-playlist-generator'  // 🆕
+import { ensureSessionStarted, isWarmSession } from '@/service/app-session'
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(() => !isWarmSession())
   const { setFloatingPlayerEnabled } = usePlaybackActions()
   const autoCacheStarred = useAppStore().pages.autoCacheStarred
   const { profile } = useMLStore()
@@ -72,6 +73,8 @@ function App() {
   }, [settings.llmEnabled, settings.llmLmStudioUrl, settings.llmModel, settings.llmApiKey, profile])
 
   useEffect(() => {
+    ensureSessionStarted()
+
     console.log('[App] Initializing external API services...')
     initializeServices()
     initializeListenBrainz()
@@ -127,14 +130,14 @@ function App() {
     return <SplashScreen onComplete={handleSplashComplete} />
   }
 
-  if (!isDesktop && window.innerHeight > window.innerWidth) return <Mobile /> // Support tablets but not phones
-
   return (
     <>
       {isElectron() && <UpdateObserver />}
+      <AppSessionObserver />
       <MediaSessionObserver />
       <LangObserver />
       <ThemeObserver />
+      <SettingsTrayListener />
       <SettingsDialog />
       <RouterProvider router={router} />
       <ToastContainer />

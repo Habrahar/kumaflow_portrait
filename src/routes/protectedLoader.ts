@@ -1,5 +1,9 @@
 import { redirect } from 'react-router-dom'
 import { ROUTES } from '@/routes/routesList'
+import {
+  invalidateAppSession,
+  pingWithSessionCache,
+} from '@/service/app-session'
 import { subsonic } from '@/service/subsonic'
 import { useAppStore } from '@/store/app.store'
 
@@ -11,8 +15,11 @@ export async function protectedLoader() {
   if (hasNoUrl || hasNoToken || !isServerConfigured)
     return redirect(ROUTES.SERVER_CONFIG)
 
-  const isServerUp = await subsonic.ping.pingView()
-  if (!isServerUp) return redirect(ROUTES.SERVER_CONFIG)
+  const isServerUp = await pingWithSessionCache(() => subsonic.ping.pingView())
+  if (!isServerUp) {
+    invalidateAppSession()
+    return redirect(ROUTES.SERVER_CONFIG)
+  }
 
   return null
 }
