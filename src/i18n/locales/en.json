@@ -670,7 +670,7 @@
           "label": "Prefer synced lyrics",
           "info": "When enabled, synced lyrics will be prioritized over unsynced lyrics."
         }
-      },
+      }
     },
     "privacy": {
       "services": {
